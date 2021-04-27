@@ -2,12 +2,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#define V_MEDIA 900
 
 typedef struct edge
 {
     struct node *from;
     struct node *to;
     float distance;
+    float flightTime;
 } Edge;
 
 typedef struct node
@@ -54,9 +56,15 @@ float deg2rad(double deg) {
     return deg * (M_PI/180);
 }
 
+void averageFlightTime(Edge *e){
+
+    e->flightTime = e->distance / V_MEDIA;
+
+}
+
 double calcGeodesicDist(float lat1, float lng1, float lat2, float lng2)
 {
-    float R = 6371;                    // Radius of the earth in km
+    float R = 6371.0087;                    // Radius of the earth in km
     double dLat = deg2rad(lat2 - lat1); // deg2rad below
     double dLon = deg2rad(lng2 - lng1);
     double a =
@@ -66,7 +74,6 @@ double calcGeodesicDist(float lat1, float lng1, float lat2, float lng2)
     double c = 2 * atan2(sqrt(a), sqrt(1 - a));
     double d = R * c; // Distance in km
     return d;
-
 }
 
 // codigo divino
@@ -92,8 +99,9 @@ void addAirportConnection(Node *from, Node *to)
     // supondo que a terra eh plana...
     //edge->distance = 111 * sqrt(pow(to->lat - from->lat, 2) + pow(to->lng - from->lng, 2));
 
-    //Arredondando a Terra
+    // Corrigindo a curvatura da Terra
     edge->distance = calcGeodesicDist(from->lat, from->lng, to->lat, to->lng);
+    averageFlightTime(edge);
 
     from->connections[from->connectionsLength] = edge;
     from->connectionsLength++;
@@ -186,7 +194,7 @@ int main(void)
     {
         printf("Amount of connections: %d\n", airport->connectionsLength);
         for (int i = 0; i < airport->connectionsLength; i++)
-            printf("%s: %.2f\n", airport->connections[i]->to->IATA, airport->connections[i]->distance);
+            printf("\n%s: %.2fkm\n     %.2f hours\n", airport->connections[i]->to->IATA, airport->connections[i]->distance, airport->connections[i]->flightTime);
     }
     else
     {

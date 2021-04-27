@@ -18,8 +18,8 @@ typedef struct node
     int connectionsLength;
     char IATA[4];
     char name[64];
-    float lat;
-    float lng;
+    double lat;
+    double lng;
 } Node;
 
 typedef struct graph
@@ -50,6 +50,25 @@ Node *getNodeAirport(Graph *g, int airportId)
     return NULL;
 }
 
+float deg2rad(double deg) {
+    return deg * (M_PI/180);
+}
+
+double calcGeodesicDist(float lat1, float lng1, float lat2, float lng2)
+{
+    float R = 6371;                    // Radius of the earth in km
+    double dLat = deg2rad(lat2 - lat1); // deg2rad below
+    double dLon = deg2rad(lng2 - lng1);
+    double a =
+        sin(dLat / 2) * sin(dLat / 2) +
+        cos(deg2rad(lat1)) * cos(deg2rad(lat2)) *
+            sin(dLon / 2) * sin(dLon / 2);
+    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+    double d = R * c; // Distance in km
+    return d;
+
+}
+
 // codigo divino
 // favor nao mexer
 void addAirportConnection(Node *from, Node *to)
@@ -71,7 +90,10 @@ void addAirportConnection(Node *from, Node *to)
 
     // ex. de utilidade -> calcular distancias, Verificar voos conectivos, tempo médio de voo.
     // supondo que a terra eh plana...
-    edge->distance = 111 * sqrt(pow(to->lat - from->lat, 2) + pow(to->lng - from->lng, 2));
+    //edge->distance = 111 * sqrt(pow(to->lat - from->lat, 2) + pow(to->lng - from->lng, 2));
+
+    //Arredondando a Terra
+    edge->distance = calcGeodesicDist(from->lat, from->lng, to->lat, to->lng);
 
     from->connections[from->connectionsLength] = edge;
     from->connectionsLength++;
@@ -171,5 +193,6 @@ int main(void)
         printf("IATA Inválido!!!\n");
     }
 
+    system("pause");
     return 0;
 }

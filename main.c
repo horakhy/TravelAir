@@ -30,6 +30,14 @@ typedef struct graph
     int length;
 } Graph;
 
+typedef struct queue
+{
+    int first;
+    int last;
+    int size;
+    int *array;
+} Queue;
+
 void addNode(Graph *g, Node *node)
 {
     if (g->length == 0)
@@ -52,6 +60,15 @@ Node *getNodeAirport(Graph *g, int airportId)
     return NULL;
 }
 
+int checkConnections(Graph *g, Node *from, Node *to, int *distanceBtwAirp, int *numOfConnections, char connections[]){
+    
+    Node *queue = from;
+    //Queue q = (Queue *)malloc(sizeof(* Queue));
+
+    
+    return 0;
+}
+
 float deg2rad(double deg)
 {
     return deg * (M_PI / 180);
@@ -59,10 +76,9 @@ float deg2rad(double deg)
 
 void averageFlightTime(Edge *e)
 {
-
     e->flightTime = e->distance / V_MEDIA;
 }
-// Calculate the distance between airports adjusted with the Earth's curvature
+// Calculate the distance between airports on the surface of the Earth
 double calcGeodesicLength(float lat1, float lng1, float lat2, float lng2)
 {
     float R = 6371.0087;                // Radius of the earth in km
@@ -194,25 +210,49 @@ int main(void)
     scanf("%d", &option);
     
     char from[4];
+    char to[4];
+    int distanceBtwAirp;
+    int numOfConnections;
+    char connections[50];
+
     switch (option){
         case 1:
             printf("Entre com o IATA: ");
             scanf("%s", from);
             Node *airport = getNodeFromIATA(&graph, from);
 
-            if (airport != NULL)
-            {
+            if (airport != NULL){
                 printf("Amount of connections: %d\n", airport->connectionsLength);
                 for (int i = 0; i < airport->connectionsLength; i++)
-                printf("\n%s: %.2fkm\n     %.2f hours\n", airport->connections[i]->to->IATA, airport->connections[i]->distance, airport->connections[i]->flightTime);
+                printf("\n%s: %.2fkm\n     %.2f hours\n", airport->connections[i]->to->IATA, airport->connections[i]->distance,
+                 airport->connections[i]->flightTime);
             }
-            else
-            {
+            else{
                 printf("IATA Inválido!!!\n");
             }
             break;
         case 2:
-            printf("FOI\n");
+
+            printf("Entre com o IATA inicial: ");
+            scanf("%s", from);
+
+            printf("Entre com o IATA destino: ");
+            scanf("%s", to);
+
+            Node *airpFrom = getNodeFromIATA(&graph, from);
+            Node *airpTo = getNodeFromIATA(&graph, to);
+
+            checkConnections(&graph, airpFrom, airpTo, &distanceBtwAirp, &numOfConnections, connections);
+
+            printf("O numero de conexões é: ");
+            printf("%d", numOfConnections);
+            
+            printf("A distancia é de: ");
+            printf("%s", connections);
+
+            printf("A distancia é de: ");
+            printf("%d", distanceBtwAirp);
+
             break;
         default:
             printf("Escolha uma opção válida!!!\n");

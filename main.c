@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#define V_MEDIA 900
+#define V_MEDIA 840
 
 typedef struct edge
 {
@@ -52,19 +52,20 @@ Node *getNodeAirport(Graph *g, int airportId)
     return NULL;
 }
 
-float deg2rad(double deg) {
-    return deg * (M_PI/180);
+float deg2rad(double deg)
+{
+    return deg * (M_PI / 180);
 }
 
-void averageFlightTime(Edge *e){
+void averageFlightTime(Edge *e)
+{
 
     e->flightTime = e->distance / V_MEDIA;
-
 }
-
-double calcGeodesicDist(float lat1, float lng1, float lat2, float lng2)
+// Calculate the distance between airports adjusted with the Earth's curvature
+double calcGeodesicLength(float lat1, float lng1, float lat2, float lng2)
 {
-    float R = 6371.0087;                    // Radius of the earth in km
+    float R = 6371.0087;                // Radius of the earth in km
     double dLat = deg2rad(lat2 - lat1); // deg2rad below
     double dLon = deg2rad(lng2 - lng1);
     double a =
@@ -99,8 +100,8 @@ void addAirportConnection(Node *from, Node *to)
     // supondo que a terra eh plana...
     //edge->distance = 111 * sqrt(pow(to->lat - from->lat, 2) + pow(to->lng - from->lng, 2));
 
-    // Corrigindo a curvatura da Terra
-    edge->distance = calcGeodesicDist(from->lat, from->lng, to->lat, to->lng);
+    // Corrigindo a distância com a curvatura da Terra
+    edge->distance = calcGeodesicLength(from->lat, from->lng, to->lat, to->lng);
     averageFlightTime(edge);
 
     from->connections[from->connectionsLength] = edge;
@@ -185,20 +186,37 @@ int main(void)
 
     fclose(fp);
 
-    char from[4];
-    printf("Entre com o IATA: ");
-    scanf("%s", from);
-    Node *airport = getNodeFromIATA(&graph, from);
+    int option;
 
-    if (airport != NULL)
-    {
-        printf("Amount of connections: %d\n", airport->connectionsLength);
-        for (int i = 0; i < airport->connectionsLength; i++)
-            printf("\n%s: %.2fkm\n     %.2f hours\n", airport->connections[i]->to->IATA, airport->connections[i]->distance, airport->connections[i]->flightTime);
-    }
-    else
-    {
-        printf("IATA Inválido!!!\n");
+    printf("ESCOLHA SUA OPÇÃO: \n");
+    printf("1.Verificar as conexões de um aeroporto \n");
+    printf("2.Verificar a distância entre dois aeroportos: \n");
+    scanf("%d", &option);
+    
+    char from[4];
+    switch (option){
+        case 1:
+            printf("Entre com o IATA: ");
+            scanf("%s", from);
+            Node *airport = getNodeFromIATA(&graph, from);
+
+            if (airport != NULL)
+            {
+                printf("Amount of connections: %d\n", airport->connectionsLength);
+                for (int i = 0; i < airport->connectionsLength; i++)
+                printf("\n%s: %.2fkm\n     %.2f hours\n", airport->connections[i]->to->IATA, airport->connections[i]->distance, airport->connections[i]->flightTime);
+            }
+            else
+            {
+                printf("IATA Inválido!!!\n");
+            }
+            break;
+        case 2:
+            printf("FOI\n");
+            break;
+        default:
+            printf("Escolha uma opção válida!!!\n");
+            break;
     }
 
     system("pause");

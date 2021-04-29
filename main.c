@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+
 #define V_MEDIA 840
 
 typedef struct edge
@@ -64,8 +65,6 @@ int checkConnections(Graph *g, Node *from, Node *to, int *distanceBtwAirp, int *
     
     Node *queue = from;
     //Queue q = (Queue *)malloc(sizeof(* Queue));
-
-    
     return 0;
 }
 
@@ -78,6 +77,7 @@ void averageFlightTime(Edge *e)
 {
     e->flightTime = e->distance / V_MEDIA;
 }
+
 // Calculate the distance between airports on the surface of the Earth
 double calcGeodesicLength(float lat1, float lng1, float lat2, float lng2)
 {

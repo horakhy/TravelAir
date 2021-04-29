@@ -224,7 +224,7 @@ int main(void)
             if (airport != NULL){
                 printf("Amount of connections: %d\n", airport->connectionsLength);
                 for (int i = 0; i < airport->connectionsLength; i++)
-                printf("\n%s: %.2fkm\n     %.2f hours\n", airport->connections[i]->to->IATA, airport->connections[i]->distance,
+                printf("\n%s: \n     Distance:\t   %.2f km\n     Flight Time:  %.2f hours\n", airport->connections[i]->to->IATA, airport->connections[i]->distance,
                  airport->connections[i]->flightTime);
             }
             else{

@@ -3,7 +3,9 @@
 #include <string.h>
 #include <math.h>
 
-#define V_MEDIA 840
+#define V_MEDIA 840                         // Velocidade media
+#define BFS_NODE_LIST_START     10000       // Tamanho inicial da lista de nós a manter em memoria para procura em BFS
+#define BFS_NODE_LIST_STEP      1000        // Tamanho a ser incrementado na lista caso esteja perto de estar cheio
 
 typedef struct edge
 {
@@ -29,15 +31,19 @@ typedef struct graph
 {
     Node **nodes;
     int length;
+    int *visited;
 } Graph;
 
-typedef struct queue
-{
-    int first;
-    int last;
-    int size;
-    int *array;
+typedef struct queue {
+	Node **items;
+	int front;
+	int size;
 } Queue;
+
+Queue* createQueue();
+void enqueue(Queue *q, Node* n);
+Node* dequeue(Queue *q);
+int inQueue(Queue *q, Node* n);
 
 void addNode(Graph *g, Node *node)
 {
@@ -61,11 +67,126 @@ Node *getNodeAirport(Graph *g, int airportId)
     return NULL;
 }
 
-int checkConnections(Graph *g, Node *from, Node *to, int *distanceBtwAirp, int *numOfConnections, char connections[]){
-    
-    Node *queue = from;
-    //Queue q = (Queue *)malloc(sizeof(* Queue));
-    return 0;
+Queue* createQueue() {
+	Queue* q = (Queue*)malloc(sizeof(Queue));
+	q->front = -1;
+	q->items = NULL;
+	q->size = 0;
+	return q;
+}
+void enqueue(Queue *q, Node *n) {
+	q->size++;
+	if(q->size == 1) q->items = (Node**)malloc(sizeof(Node*)*q->size);
+	else q->items = (Node**)realloc(q->items, sizeof(Node*)*q->size);
+	if (q->size == 1) q->front = 0;
+	q->items[q->size-1] = n;
+}
+Node* dequeue(Queue *q) {
+	if(q->size == 0) return NULL;
+	if(q->front == q->size) return NULL;
+	Node* n = q->items[q->front];
+    q->front++;
+	return n;
+}
+int inQueue(Queue* q, Node* n) {
+	for(int i = 0; i < q->size; i++)
+		if(q->items[i] == n) return 1;
+	return 0;
+}
+
+typedef struct _nodeQueue {
+	Node* node; // node a ser verificado
+	Queue queue; // caminho
+} NodeQueue;
+
+// void printQueue(Queue *q){
+// 	printf("QUEUE [");
+// 	for(int i = 0; i < q->size; i++)
+// 		printf("%s, ", q->items[i]->IATA);
+// 	printf("].\n");
+// }
+
+Queue copyQueue(Queue *q){
+    Queue* newQ = createQueue();
+    newQ->front = q->front;
+    newQ->size = q->size;
+    newQ->items = (Node**)malloc(sizeof(Node*)*q->size);
+    memcpy(newQ->items, q->items, sizeof(Node*)*q->size);
+    return *newQ;
+}
+
+void checkConnections(Graph *g, Node *from, Node *dest){
+	Queue *visited = createQueue();
+
+    int currentSize = 10000; // current size of the nodeQueue
+	NodeQueue* nodeQueue = (NodeQueue*)malloc(sizeof(NodeQueue)*currentSize);
+
+	int index = 0;
+	int done = 0;
+	int size = 0;
+    float fullDistance = 0;
+	nodeQueue[index].node = from;
+    nodeQueue[index].queue = *(createQueue());
+
+    enqueue(visited, from);
+
+	while (done == 0) {
+		Node* currentNode = nodeQueue[index].node;
+
+		if(currentNode == NULL)
+			break;
+
+        // for(int i = 0; i < 500; i++){
+        //     if(nodeQueue[i].queue.size == 0) continue;
+        //     printf("nodeQueue[%d]:\n", i);
+        //     printf("\tNode: %s", nodeQueue[i].node->IATA);
+        //     printf("\t");
+        //     printQueue(&(nodeQueue[i].queue));
+        // }
+
+		enqueue(&(nodeQueue[index].queue), currentNode);
+
+		// printf("Antes Node add: %s\n", currentNode->IATA);
+		// printQueue(&(nodeQueue[index].queue));
+		// printf("\n");
+
+		for(int i = 0; i < currentNode->connectionsLength; i++){
+			if(inQueue(visited, currentNode->connections[i]->to) == 1){continue;}
+
+			size++;
+			nodeQueue[size].node = currentNode->connections[i]->to;
+			nodeQueue[size].queue = copyQueue(&(nodeQueue[index].queue));
+
+			// printf("Current Node: %s\n", currentNode->IATA);
+			// printf("Node add: %s\n", nodeQueue[size].node->IATA);
+			// printQueue(&(nodeQueue[size].queue));
+			// printf("\n");
+
+			enqueue(visited, currentNode->connections[i]->to);
+
+			if(currentNode->connections[i]->to == dest){
+				done = 1;
+				break;
+			}
+
+            if(size+1 == currentSize){
+                currentSize += 1000;
+                nodeQueue = (NodeQueue*)realloc(nodeQueue, sizeof(NodeQueue)*currentSize);
+            }
+		}
+
+		index++;
+	}
+
+	if(done == 1)
+	{
+        int nodeQSize = nodeQueue[size].queue.size;
+		for(int i = 0; i < nodeQSize; i++){
+			printf("Conexao: %d/%d -> %s\n", i + 1, nodeQSize + 1, nodeQueue[size].queue.items[i]->IATA);
+		}
+		printf("Conexao: %d/%d -> %s\n", nodeQSize + 1, nodeQSize + 1, dest->IATA);
+	}
+	else printf("Nenhum caminho encontrado!\n");
 }
 
 float deg2rad(double deg)
@@ -93,8 +214,6 @@ double calcGeodesicLength(float lat1, float lng1, float lat2, float lng2)
     return d;
 }
 
-// codigo divino
-// favor nao mexer
 void addAirportConnection(Node *from, Node *to)
 {
     if (to == NULL)
@@ -112,10 +231,6 @@ void addAirportConnection(Node *from, Node *to)
     edge->to = to;
     edge->from = from;
 
-    // ex. de utilidade -> calcular distancias, Verificar voos conectivos, tempo médio de voo.
-    // supondo que a terra eh plana...
-    //edge->distance = 111 * sqrt(pow(to->lat - from->lat, 2) + pow(to->lng - from->lng, 2));
-
     // Corrigindo a distância com a curvatura da Terra
     edge->distance = calcGeodesicLength(from->lat, from->lng, to->lat, to->lng);
     averageFlightTime(edge);
@@ -127,10 +242,8 @@ void addAirportConnection(Node *from, Node *to)
 Node *getNodeFromIATA(Graph *g, char *iata)
 {
     for (int i = 0; i < g->length; i++)
-    {
         if (strcmp(g->nodes[i]->IATA, iata) == 0)
             return g->nodes[i];
-    }
 
     return NULL;
 }
@@ -154,17 +267,17 @@ int main(void)
         int index = 0;
         while (ptr != NULL)
         {
-            if (index == 0)
+            if (index == 0) // Airport ID
                 n->airportId = atoi(ptr);
-            else if (index == 1)
+            else if (index == 1) // Airport IATA
                 strcpy(n->IATA, ptr);
-            else if (index == 2)
+            else if (index == 2) // City
                 strcpy(n->name, ptr);
-            else if (index == 3)
+            else if (index == 3) // Airport name
                 strcpy(n->airportName, ptr);
-            else if (index == 4)
+            else if (index == 4) // Latitude
                 n->lat = atof(ptr);
-            else if (index == 5)
+            else if (index == 5) // Longitude
                 n->lng = atof(ptr);
             n->connectionsLength = 0;
             n->connections = NULL;
@@ -184,13 +297,13 @@ int main(void)
         Node *from;
         while (ptr != NULL)
         {
-            if (index == 0)
-            { // airport id index
+            if (index == 0) // airport id index
+            {
                 airportId = atoi(ptr);
                 from = getNodeAirport(&graph, airportId);
             }
-            else if (index >= 6)
-            { // connections start index
+            else if (index >= 6) // connections start index
+            {
                 int connectionId = atoi(ptr);
                 Node *to = getNodeAirport(&graph, connectionId);
                 addAirportConnection(from, to);
@@ -203,12 +316,11 @@ int main(void)
     fclose(fp);
 
     int option;
-
     printf("ESCOLHA SUA OPÇÃO: \n");
     printf("1.Verificar as conexões de um aeroporto \n");
-    printf("2.Verificar a distância entre dois aeroportos: \n");
+    printf("2.Verificar as conexões entre dois aeroportos: \n");
     scanf("%d", &option);
-    
+
     char from[4];
     char to[4];
     int distanceBtwAirp;
@@ -222,9 +334,9 @@ int main(void)
             Node *airport = getNodeFromIATA(&graph, from);
 
             if (airport != NULL){
-                printf("Amount of connections: %d\n", airport->connectionsLength);
+                printf("Quantidade de conexoes: %d\n", airport->connectionsLength);
                 for (int i = 0; i < airport->connectionsLength; i++)
-                printf("\n%s: \n     Distance:\t   %.2f km\n     Flight Time:  %.2f hours\n", airport->connections[i]->to->IATA, airport->connections[i]->distance,
+                printf("\n%s: \n     Distancia:\t   %.2f km\n     Tempo de voo:  %.2f horas\n", airport->connections[i]->to->IATA, airport->connections[i]->distance,
                  airport->connections[i]->flightTime);
             }
             else{
@@ -242,16 +354,7 @@ int main(void)
             Node *airpFrom = getNodeFromIATA(&graph, from);
             Node *airpTo = getNodeFromIATA(&graph, to);
 
-            checkConnections(&graph, airpFrom, airpTo, &distanceBtwAirp, &numOfConnections, connections);
-
-            printf("O numero de conexões é: ");
-            printf("%d", numOfConnections);
-            
-            printf("A distancia é de: ");
-            printf("%s", connections);
-
-            printf("A distancia é de: ");
-            printf("%d", distanceBtwAirp);
+            checkConnections(&graph, airpFrom, airpTo);
 
             break;
         default:

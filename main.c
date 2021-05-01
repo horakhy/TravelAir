@@ -333,7 +333,7 @@ int main(void)
             scanf("%s", from);
             Node *airport = getNodeFromIATA(&graph, from);
 
-            if (airport != NULL){
+            if (airport != NULL){   // NULL pointer verification
                 printf("Quantidade de conexoes: %d\n", airport->connectionsLength);
                 for (int i = 0; i < airport->connectionsLength; i++)
                 printf("\n%s: \n     Distancia:\t   %.2f km\n     Tempo de voo:  %.2f horas\n", airport->connections[i]->to->IATA, airport->connections[i]->distance,
@@ -354,11 +354,17 @@ int main(void)
             Node *airpFrom = getNodeFromIATA(&graph, from);
             Node *airpTo = getNodeFromIATA(&graph, to);
 
-            if (airpFrom && airpTo != NULL){
-                checkConnections(&graph, airpFrom, airpTo);
+            if (airpFrom == NULL){ // NULL pointer verification
+                printf("\n%s não é um IATA válido!!!\n", from);
             }
-            else{
-                printf("IATA Inválido!!!\n");
+            if(airpTo == NULL){
+                printf("\n%s não é um IATA válido!!!\n", to);
+            }
+            if(airpFrom == airpTo && (airpFrom && airpTo != NULL)){
+                printf("Os aeroportos inicial e destino devem ser diferentes!!!\n");
+            }
+            else if(airpFrom && airpTo != NULL){
+                checkConnections(&graph, airpFrom, airpTo);
             }
             break;
         default:

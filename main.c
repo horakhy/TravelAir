@@ -358,7 +358,7 @@ int main(void)
                 printf("\n%s não é um IATA válido!!!\n", from);
             }
             if(airpTo == NULL){
-                printf("%s não é um IATA válido!!!\n", to);
+                printf("\n%s não é um IATA válido!!!\n", to);
             }
             if(airpFrom == airpTo && (airpFrom && airpTo != NULL)){
                 printf("Os aeroportos inicial e destino devem ser diferentes!!!\n");

@@ -354,8 +354,12 @@ int main(void)
             Node *airpFrom = getNodeFromIATA(&graph, from);
             Node *airpTo = getNodeFromIATA(&graph, to);
 
-            checkConnections(&graph, airpFrom, airpTo);
-
+            if (airpFrom && airpTo != NULL){
+                checkConnections(&graph, airpFrom, airpTo);
+            }
+            else{
+                printf("IATA Inválido!!!\n");
+            }
             break;
         default:
             printf("Escolha uma opção válida!!!\n");

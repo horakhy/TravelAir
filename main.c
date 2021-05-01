@@ -329,7 +329,7 @@ int main(void)
 
     switch (option){
         case 1:
-            printf("Entre com o IATA: ");
+            printf("Entre com o IATA: \n");
             scanf("%s", from);
             Node *airport = getNodeFromIATA(&graph, from);
 

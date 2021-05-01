@@ -182,7 +182,7 @@ void checkConnections(Graph *g, Node *from, Node *dest){
 	{
         int nodeQSize = nodeQueue[size].queue.size;
 		for(int i = 0; i < nodeQSize; i++){
-			printf("Conexao: %d/%d -> %s\n", i + 1, nodeQSize + 1, nodeQueue[size].queue.items[i]->IATA);
+			printf("\nConexao: %d/%d -> %s\n", i + 1, nodeQSize + 1, nodeQueue[size].queue.items[i]->IATA);
 		}
 		printf("Conexao: %d/%d -> %s\n", nodeQSize + 1, nodeQSize + 1, dest->IATA);
 	}
@@ -316,7 +316,7 @@ int main(void)
     fclose(fp);
 
     int option;
-    printf("ESCOLHA SUA OPÇÃO: \n");
+    printf("\nESCOLHA SUA OPÇÃO: \n");
     printf("1.Verificar as conexões de um aeroporto \n");
     printf("2.Verificar as conexões entre dois aeroportos: \n");
     scanf("%d", &option);
@@ -345,12 +345,14 @@ int main(void)
             break;
         case 2:
 
-            printf("Entre com o IATA inicial: ");
+            printf("Entre com o IATA inicial: \n");
             scanf("%s", from);
+            printf("\n");
 
-            printf("Entre com o IATA destino: ");
+            printf("Entre com o IATA destino: \n");
             scanf("%s", to);
-
+            printf("\n");
+            
             Node *airpFrom = getNodeFromIATA(&graph, from);
             Node *airpTo = getNodeFromIATA(&graph, to);
 
@@ -358,7 +360,7 @@ int main(void)
                 printf("\n%s não é um IATA válido!!!\n", from);
             }
             if(airpTo == NULL){
-                printf("\n%s não é um IATA válido!!!\n", to);
+                printf("%s não é um IATA válido!!!\n", to);
             }
             if(airpFrom == airpTo && (airpFrom && airpTo != NULL)){
                 printf("Os aeroportos inicial e destino devem ser diferentes!!!\n");

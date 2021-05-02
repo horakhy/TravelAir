@@ -2,48 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include "TravelAir.h"
 
-#define V_MEDIA 840                         // Velocidade media
-#define BFS_NODE_LIST_START     10000       // Tamanho inicial da lista de nós a manter em memoria para procura em BFS
-#define BFS_NODE_LIST_STEP      1000        // Tamanho a ser incrementado na lista caso esteja perto de estar cheio
-
-typedef struct edge
-{
-    struct node *from;
-    struct node *to;
-    float distance;
-    float flightTime;
-} Edge;
-
-typedef struct node
-{
-    int airportId;
-    char airportName[64];
-    Edge **connections;
-    int connectionsLength;
-    char IATA[4];
-    char name[64];
-    double lat;
-    double lng;
-} Node;
-
-typedef struct graph
-{
-    Node **nodes;
-    int length;
-    int *visited;
-} Graph;
-
-typedef struct queue {
-	Node **items;
-	int front;
-	int size;
-} Queue;
-
-Queue* createQueue();
-void enqueue(Queue *q, Node* n);
-Node* dequeue(Queue *q);
-int inQueue(Queue *q, Node* n);
+#define V_MEDIA 840                         // Average speed of a commercial flight
+#define BFS_NODE_LIST_START     10000       // Initial size of the list of nodes to keep in memory for the BFS (Tamanho inicial da lista de nós a manter em memoria para procura em BFS)
+#define BFS_NODE_LIST_STEP      1000        // Size to increase the list if needed (Tamanho a ser incrementado na lista caso esteja perto de estar cheio)
 
 void addNode(Graph *g, Node *node)
 {
@@ -94,11 +57,6 @@ int inQueue(Queue* q, Node* n) {
 	return 0;
 }
 
-typedef struct _nodeQueue {
-	Node* node; // node a ser verificado
-	Queue queue; // caminho
-} NodeQueue;
-
 // void printQueue(Queue *q){
 // 	printf("QUEUE [");
 // 	for(int i = 0; i < q->size; i++)
@@ -115,6 +73,7 @@ Queue copyQueue(Queue *q){
     return *newQ;
 }
 
+// Print the connections between two airports
 void checkConnections(Graph *g, Node *from, Node *dest){
 	Queue *visited = createQueue();
 
@@ -231,7 +190,7 @@ void addAirportConnection(Node *from, Node *to)
     edge->to = to;
     edge->from = from;
 
-    // Corrigindo a distância com a curvatura da Terra
+    // Correcting the distance taking the Earth's curvature into account
     edge->distance = calcGeodesicLength(from->lat, from->lng, to->lat, to->lng);
     averageFlightTime(edge);
 
@@ -267,13 +226,13 @@ int main(void)
         int index = 0;
         while (ptr != NULL)
         {
-            if (index == 0) // Airport ID
+            if (index == 0) // Airport's ID
                 n->airportId = atoi(ptr);
-            else if (index == 1) // Airport IATA
+            else if (index == 1) // Airport's IATA
                 strcpy(n->IATA, ptr);
             else if (index == 2) // City
                 strcpy(n->name, ptr);
-            else if (index == 3) // Airport name
+            else if (index == 3) // Airport's name
                 strcpy(n->airportName, ptr);
             else if (index == 4) // Latitude
                 n->lat = atof(ptr);
@@ -372,6 +331,6 @@ int main(void)
             break;
     }
 
-    //system("pause");
+    system("pause");
     return 0;
 }

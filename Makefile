@@ -1,8 +1,8 @@
 Teste0: main.c # Teste com a localidade válidas
 	@printf "\n--Teste para imprimir conexões com localidade válida--\n"
-	@printf "Caso 1, IATA escolhido: CWB\n"
+	@printf "Caso 1, IATA escolhido: BOB\n"
 	@gcc -lm -o $@ $<
-	@echo 1 CWB | ./$@
+	@echo 1 BOB | ./$@
 
 Teste1: main.c # Teste com a localidade inválidas
 	@printf "\n--Teste para imprimir conexões com localidade inválida--\n"

@@ -340,7 +340,7 @@ int main(void)
                  airport->connections[i]->flightTime);
             }
             else{
-                printf("IATA Inválido!!!\n");
+                printf("\nIATA Inválido!!!\n");
             }
             break;
         case 2:

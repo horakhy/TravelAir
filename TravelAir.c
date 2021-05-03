@@ -5,8 +5,8 @@
 #include "TravelAir.h"
 
 #define V_MEDIA 840                         // Average speed of a commercial flight
-#define BFS_NODE_LIST_START     10000       // Initial size of the list of nodes to keep in memory for the BFS (Tamanho inicial da lista de nós a manter em memoria para procura em BFS)
-#define BFS_NODE_LIST_STEP      1000        // Size to increase the list if needed (Tamanho a ser incrementado na lista caso esteja perto de estar cheio)
+#define BFS_NODE_LIST_START     10000       // Initial size of the list of nodes to keep in memory for the BFS 
+#define BFS_NODE_LIST_STEP      1000        // Size to increase the list if needed 
 
 void addNode(Graph *g, Node *node)
 {
@@ -70,7 +70,7 @@ Queue copyQueue(Queue *q){
 void checkConnections(Graph *g, Node *from, Node *dest){
 	Queue *visited = createQueue();
 
-    int currentSize = 10000; // current size of the nodeQueue
+    int currentSize = 10000; // Current size of the nodeQueue
 	NodeQueue* nodeQueue = (NodeQueue*)malloc(sizeof(NodeQueue)*currentSize);
 
 	int index = 0;
@@ -268,7 +268,7 @@ int main(void)
             scanf("%s", from);
             Node *airport = getNodeFromIATA(&graph, from);
 
-            if (airport != NULL){   // NULL pointer verification
+            if (airport != NULL){  
                 printf("Quantidade de conexoes: %d\n", airport->connectionsLength);
                 for (int i = 0; i < airport->connectionsLength; i++)
                 printf("\n%s: \n     Distancia:\t   %.2f km\n     Tempo de voo:  %.2f horas\n", airport->connections[i]->to->IATA, airport->connections[i]->distance,
@@ -278,8 +278,8 @@ int main(void)
                 printf("\nIATA Inválido!!!\n");
             }
             break;
+            
         case 2:
-
             printf("Entre com o IATA inicial: \n");
             scanf("%s", from);
 
@@ -289,7 +289,7 @@ int main(void)
             Node *airpFrom = getNodeFromIATA(&graph, from);
             Node *airpTo = getNodeFromIATA(&graph, to);
 
-            if (airpFrom == NULL){ // NULL pointer verification
+            if (airpFrom == NULL){ 
                 printf("\n%s não é um IATA válido!!!\n", from);
             }
             if(airpTo == NULL){

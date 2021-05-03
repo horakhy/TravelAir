@@ -32,7 +32,7 @@ typedef struct queue {
 } Queue;
 
 typedef struct _nodeQueue {
-	Node* node; // node to be verified
+	Node* node; // Node to be verified
 	Queue queue; // Path
 } NodeQueue;
 

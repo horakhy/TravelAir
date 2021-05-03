@@ -57,13 +57,6 @@ int inQueue(Queue* q, Node* n) {
 	return 0;
 }
 
-// void printQueue(Queue *q){
-// 	printf("QUEUE [");
-// 	for(int i = 0; i < q->size; i++)
-// 		printf("%s, ", q->items[i]->IATA);
-// 	printf("].\n");
-// }
-
 Queue copyQueue(Queue *q){
     Queue* newQ = createQueue();
     newQ->front = q->front;
@@ -95,19 +88,7 @@ void checkConnections(Graph *g, Node *from, Node *dest){
 		if(currentNode == NULL)
 			break;
 
-        // for(int i = 0; i < 500; i++){
-        //     if(nodeQueue[i].queue.size == 0) continue;
-        //     printf("nodeQueue[%d]:\n", i);
-        //     printf("\tNode: %s", nodeQueue[i].node->IATA);
-        //     printf("\t");
-        //     printQueue(&(nodeQueue[i].queue));
-        // }
-
 		enqueue(&(nodeQueue[index].queue), currentNode);
-
-		// printf("Antes Node add: %s\n", currentNode->IATA);
-		// printQueue(&(nodeQueue[index].queue));
-		// printf("\n");
 
 		for(int i = 0; i < currentNode->connectionsLength; i++){
 			if(inQueue(visited, currentNode->connections[i]->to) == 1){continue;}
@@ -115,11 +96,6 @@ void checkConnections(Graph *g, Node *from, Node *dest){
 			size++;
 			nodeQueue[size].node = currentNode->connections[i]->to;
 			nodeQueue[size].queue = copyQueue(&(nodeQueue[index].queue));
-
-			// printf("Current Node: %s\n", currentNode->IATA);
-			// printf("Node add: %s\n", nodeQueue[size].node->IATA);
-			// printQueue(&(nodeQueue[size].queue));
-			// printf("\n");
 
 			enqueue(visited, currentNode->connections[i]->to);
 
@@ -162,7 +138,7 @@ void averageFlightTime(Edge *e)
 double calcGeodesicLength(float lat1, float lng1, float lat2, float lng2)
 {
     float R = 6371.0087;                // Radius of the earth in km
-    double dLat = deg2rad(lat2 - lat1); // deg2rad below
+    double dLat = deg2rad(lat2 - lat1); // Deg2rad below
     double dLon = deg2rad(lng2 - lng1);
     double a =
         sin(dLat / 2) * sin(dLat / 2) +
@@ -256,12 +232,12 @@ int main(void)
         Node *from;
         while (ptr != NULL)
         {
-            if (index == 0) // airport id index
+            if (index == 0) // Airport id index
             {
                 airportId = atoi(ptr);
                 from = getNodeAirport(&graph, airportId);
             }
-            else if (index >= 6) // connections start index
+            else if (index >= 6) // Connections start index
             {
                 int connectionId = atoi(ptr);
                 Node *to = getNodeAirport(&graph, connectionId);
@@ -331,6 +307,6 @@ int main(void)
             break;
     }
 
-    system("pause");
+    //system("pause");
     return 0;
 }

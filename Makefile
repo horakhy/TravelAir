@@ -1,3 +1,6 @@
+Run: TravelAir.c
+	@gcc -lm -o $@ $<
+
 Teste0: TravelAir.c # Teste com a localidade válidas
 	@printf "\n--Teste para imprimir conexões com localidade válida--\n"
 	@printf "Caso 1, IATA escolhido: BOB\n"
@@ -47,4 +50,3 @@ Teste7: TravelAir.c # Teste com ambas as localidades inválidas e idênticas
 	@echo 2 XXX XXX | ./$@
 
 Teste: Teste0 Teste1 Teste2 Teste3 Teste4 Teste5 Teste6 Teste7
-	@rm Teste*

@@ -21,7 +21,7 @@ Agradecemos às seguintes pessoas que contribuíram para este projeto:
       </a>
     </td>
     <td align="center">
-      <a href="https://github.com/Rain-Moretti/">
+      <a href="https://github.com/Raian-Moretti/">
         <img src="https://avatars.githubusercontent.com/u/48537653?v=4" width="100px;" alt="Foto do Raian Moretti no GitHub"/><br>
         <sub>
           <b>Raian Moretti</b>
